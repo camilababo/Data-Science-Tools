@@ -1,10 +1,5 @@
-# Data Science Porjects
+# SQL for Data Analysis
 
-This repository explores different tools essential to extract meaningful insights and drive data-driven solutions.
-
-## Features
-
-This repository features the following:
-
-- [SQL](SQL): Provides examples and scripts based on Structured Query Language to extract information from databases;
-- [Analysis](Analysis): Includes examples of data collection, analysis, and interpretation to drive informed decisions. Currently, only includes a [Data Analysis](Analysis/barcelona-rental-properties-analysis.ipynb) on Barcelona's current available properties using [web-scraped data](https://github.com/camilababo/Pyhton-Automation-Projects/tree/master/Web_Scrapping).
+This repository contains scripts to query and extract information from a database created for a imaginary paper company, Parch and Posey.
+The database can be access on [parch-and-posey.sql.txt](parch-and-posey.sql.txt) and was originally extracted from Udacity's SQL course ['SQL for Data Analysis'](https://www.udacity.com/course/sql-for-data-analysis--ud198), lectured by Derek Steer.
+PostGreSQL was used to load the database and write the queries.
