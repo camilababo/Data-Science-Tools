@@ -1,0 +1,1 @@
+Currently, this folder only includes a [Data Analysis](Analysis/barcelona-rental-properties-analysis.ipynb) on Barcelona's current available properties using [web-scraped data](https://github.com/camilababo/Pyhton-Automation-Projects/tree/master/Web_Scrapping).
