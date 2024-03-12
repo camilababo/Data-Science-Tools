@@ -127,3 +127,27 @@ WHERE o.occurred_at > '2015-12-31'
 GROUP BY 1
 ORDER BY 2 DESC;
 
+# Check which web extension each company uses
+SELECT RIGHT(website, 4) as web_extension,
+		COUNT(*)
+FROM accounts
+GROUP BY 1;
+
+# Check how many account names start with numbers or letters
+WITH initial AS (SELECT name,
+				 		CASE WHEN LEFT(UPPER(name), 1) IN ('0','1','2','3','4','5','6','7','8','9') THEN 1 ELSE 0 END AS num,
+						CASE WHEN LEFT(UPPER(name), 1) IN ('0','1','2','3','4','5','6','7','8','9') THEN 0 ELSE 1 END AS letter
+		FROM accounts)
+
+SELECT SUM(num) nums,
+		SUM(letter) letters
+FROM initial
+
+# Create first and last name columns
+SELECT *,
+		LEFT(primary_poc, POSITION(' ' IN primary_poc) -1) as first_name,
+		RIGHT(primary_poc, (LENGTH(primary_poc) - POSITION(' ' IN primary_poc))) AS last_name
+FROM accounts;
+
+
+

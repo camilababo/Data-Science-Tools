@@ -94,3 +94,10 @@ SELECT sales_rep_reg.sales_rep_name,
 FROM region_max
 JOIN sales_rep_reg
 ON region_max.region = sales_rep_reg.region AND region_max.top_reg_sales = sales_rep_reg.total_sales;
+
+# Create first and last name colums
+SELECT *,
+		LEFT(name, POSITION(' ' IN name) -1) as first_name,
+		RIGHT(name, (LENGTH(name) - POSITION(' ' IN name))) AS last_name
+FROM sales_reps;
+
