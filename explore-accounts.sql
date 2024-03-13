@@ -2,9 +2,29 @@
 SELECT *
     FROM accounts;
 
+# Create e-mail accounts and passwords for primary person of contact based on names and company
+# Passwords are based on first letter of first name (lowercase), then the last letter of their first name (lowercase),
+# the first letter of their last name (lowercase), the last letter of their last name (lowercase), the number of letters
+# in their first name, the number of letters in their last name, and then the name of the company they are working with,
+# all capitalized with no spaces.
+WITH clean_names AS (SELECT name AS company_name,
+						primary_poc,
+						LEFT(primary_poc, POSITION(' ' IN primary_poc) -1) AS first_name,
+						RIGHT(primary_poc, (LENGTH(primary_poc) - POSITION(' ' IN primary_poc))) AS last_name,
+						REPLACE(name, ' ', '_') AS clean_company_name
+						FROM accounts),
+		cleaner_names AS (SELECT *,
+						  	REPLACE(clean_company_name, '.', '') AS cleaner_company_names
+						FROM clean_names)
+
+SELECT company_name,
+		primary_poc,
+	CONCAT(LOWER(first_name), '.', LOWER(last_name), '@', LOWER(cleaner_company_names), '.com') AS email,
+	LOWER(LEFT(first_name, 1)) || RIGHT(first_name, 1) || LOWER(LEFT(last_name, 1)) || RIGHT(last_name, 1) || LENGTH(first_name) ||	LENGTH(last_name) || UPPER(cleaner_company_names)  AS password
+FROM cleaner_names
+
 # View all accounts that are not United Technologies
-SELECT *
-FROM accounts
+SELECT *FROM accounts
 WHERE name != 'United Technologies';
 
 # View website and person of contact for Exxon Mobil
