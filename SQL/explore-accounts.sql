@@ -21,10 +21,11 @@ SELECT company_name,
 		primary_poc,
 	CONCAT(LOWER(first_name), '.', LOWER(last_name), '@', LOWER(cleaner_company_names), '.com') AS email,
 	LOWER(LEFT(first_name, 1)) || RIGHT(first_name, 1) || LOWER(LEFT(last_name, 1)) || RIGHT(last_name, 1) || LENGTH(first_name) ||	LENGTH(last_name) || UPPER(cleaner_company_names)  AS password
-FROM cleaner_names
+FROM cleaner_names;
 
 # View all accounts that are not United Technologies
-SELECT *FROM accounts
+SELECT *
+FROM accounts
 WHERE name != 'United Technologies';
 
 # View website and person of contact for Exxon Mobil
@@ -161,9 +162,9 @@ WITH initial AS (SELECT name,
 
 SELECT SUM(num) nums,
 		SUM(letter) letters
-FROM initial
+FROM initial;
 
-# Create first and last name columns
+# Create first and last name columns for person of contact
 SELECT *,
 		LEFT(primary_poc, POSITION(' ' IN primary_poc) -1) as first_name,
 		RIGHT(primary_poc, (LENGTH(primary_poc) - POSITION(' ' IN primary_poc))) AS last_name

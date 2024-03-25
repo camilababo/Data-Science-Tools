@@ -2,6 +2,16 @@
 SELECT *
 FROM orders;
 
+# Check the time interval between accounts' orders
+SELECT account_id,
+		occurred_at,
+		LAG(occurred_at) OVER (PARTITION BY account_id ORDER BY account_id) AS lag,
+		occurred_at - LAG(occurred_at) OVER (PARTITION BY account_id ORDER BY account_id) AS lag_difference
+FROM (SELECT account_id,
+	 	occurred_at
+	 	FROM orders
+		ORDER BY 1, 2);
+
 # View company and time of order for each order
 SELECT id, account_id, occurred_at
 FROM orders;
@@ -75,7 +85,7 @@ SELECT account_id,
 		gloss_qty,
 		poster_qty
 FROM orders
-WHERE standard_qty = 0 OR gloss_qty = 0 OR poster_qty = 0
+WHERE standard_qty = 0 OR gloss_qty = 0 OR poster_qty = 0;
 
 # Selecting orders where some type of paper was omitted after 2016
 SELECT account_id,
@@ -167,7 +177,7 @@ SELECT account_id,
 		total_amt_usd,
 		CASE WHEN total_amt_usd > 3000 THEN 'Large'
 		ELSE 'Small' END AS order_level
-FROM orders
+FROM orders;
 
 # Count number of orders where total product is over and under 500
 SELECT CASE WHEN total > 500 THEN 'Over 500'
@@ -198,5 +208,53 @@ WITH t1 AS (SELECT AVG(o.total_amt_usd) AS avg_all
 
 
 SELECT AVG(avg_amt)
-FROM t2
+FROM t2;
 
+# Running total for quantity of standard paper for each month
+SELECT standard_qty,
+		DATE_TRUNC('month', occurred_at) AS month,
+		SUM(standard_qty) OVER (PARTITION BY DATE_TRUNC('month', occurred_at) ORDER BY occurred_at) as runnin_total
+FROM orders;
+
+# Yearly running total for income of standard paper
+SELECT standard_amt_usd,
+		DATE_TRUNC('year', occurred_at) AS year,
+		SUM(standard_amt_usd) OVER (PARTITION BY DATE_TRUNC('year', occurred_at) ORDER BY occurred_at) as running_total
+FROM orders;
+
+# Rank total amount of ordered paper
+SELECT id,
+		account_id,
+		total,
+		RANK() OVER (PARTITION BY account_id ORDER BY total DESC) as total_rank
+FROM orders;
+
+# Run aggregated statistics for the quantity of standard paper (by each account on a monthly basis)
+SELECT id,
+		account_id,
+		standard_qty,
+		DATE_TRUNC('month', occurred_at) AS month,
+		DENSE_RANK() OVER monthly_account AS dense_rank,
+		SUM(standard_qty) OVER monthly_account AS sum_standard_qty,
+		COUNT(standard_qty) OVER monthly_account AS count_standard_qty,
+		AVG(standard_qty) OVER monthly_account AS avg_standard_qty,
+		MIN(standard_qty) OVER monthly_account AS min_standard_qty,
+		MAX(standard_qty) OVER monthly_account AS max_standard_qty
+FROM orders
+WINDOW monthly_account AS (PARTITION BY account_id ORDER BY DATE_TRUNC('month', occurred_at));
+
+# Compare orders' current total revenue with the next one
+SELECT 	occurred_at,
+		total_amt_usd,
+		LEAD(total_amt_usd) OVER (ORDER BY occurred_at) AS lead,
+		LEAD(total_amt_usd) OVER (ORDER BY occurred_at) - total_amt_usd AS lead_difference
+FROM orders
+ORDER BY 1;
+
+# Check quartile for amount of ordered standard paper
+SELECT 	account_id,
+		occurred_at,
+		standard_qty,
+		NTILE(4) OVER (PARTITION BY account_id ORDER BY standard_qty) AS standard_quartile
+FROM orders
+ORDER BY 1;
