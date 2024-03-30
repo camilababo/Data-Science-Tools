@@ -170,5 +170,12 @@ SELECT *,
 		RIGHT(primary_poc, (LENGTH(primary_poc) - POSITION(' ' IN primary_poc))) AS last_name
 FROM accounts;
 
+# Check if there are any accounts that don't have a sales rep and each sales rep that doesn't have an account
+SELECT a.name, a.sales_rep_id, s.id, s.name
+FROM accounts AS a
+FULL OUTER JOIN sales_reps AS s
+ON a.sales_rep_id = s.id
+WHERE a.sales_rep_id IS NULL OR s.id IS NULL;
+
 
 

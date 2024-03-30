@@ -7,11 +7,30 @@ SELECT *
 FROM web_events
 WHERE channel IN ('organic', 'adwords');
 
+# Analyze Query Plan
+EXPLAIN
+SELECT *
+FROM web_events
+WHERE occurred_at >= '2016-01-01'
+	AND occurred_at < '2018-07-01';
+
 # Check organic and adwords web events for the year of 2016
 SELECT *
 FROM web_events
 WHERE channel IN ('organic', 'adwords') AND occurred_at BETWEEN '2016-01-01' AND '2017-01-01'
 ORDER BY occurred_at;
+
+# Check all web events that occurred after but not more that 1 day after another web event (for the same account)
+SELECT w1.id AS w1_id, w1.account_id AS w1_acc_id,
+		w1.occurred_at AS w1_date, w1.channel AS w1_channel,
+		w2.id AS w2_id, w2.account_id AS w2_acc_id,
+		w2.occurred_at AS w2_date, w2.channel AS w2_channel
+FROM web_events AS w1
+LEFT JOIN web_events AS w2
+ON w1.account_id = w2.account_id
+AND w2.occurred_at > w1.occurred_at
+AND w2.occurred_at <= w1.occurred_at + INTERVAL '1 day'
+ORDER BY w1.account_id, w1.occurred_at;
 
 # Check dates of web events for Walmart
 SELECT w.occurred_at,

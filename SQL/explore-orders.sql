@@ -12,6 +12,17 @@ FROM (SELECT account_id,
 	 	FROM orders
 		ORDER BY 1, 2);
 
+# Check pairs of orders where the second order occurred within 28 days of the first (for the same account)
+SELECT o1.id AS o1_id, o1.account_id AS o1_acc_id,
+		o1.occurred_at AS o1_date, o2.id AS o2_id,
+		o2.account_id AS o2_acc_id, o2.occurred_at AS o2_date
+FROM orders AS o1
+LEFT JOIN orders AS o2
+ON o1.account_id = o2.account_id
+AND o2.occurred_at > o1.occurred_at
+AND o2.occurred_at <= o1.occurred_at + INTERVAL '28 days'
+ORDER BY o1.account_id, o1.occurred_at;
+
 # View company and time of order for each order
 SELECT id, account_id, occurred_at
 FROM orders;
@@ -258,3 +269,14 @@ SELECT 	account_id,
 		NTILE(4) OVER (PARTITION BY account_id ORDER BY standard_qty) AS standard_quartile
 FROM orders
 ORDER BY 1;
+
+# Check all orders that had a previous web event
+SELECT o.id,
+		o.occurred_at as order_date,
+		w.*
+FROM orders AS o
+LEFT JOIN web_events AS w
+ON w.account_id = o.account_id AND w.occurred_at < o.occurred_at
+WHERE DATE_TRUNC('month', o.occurred_at) =
+	(SELECT DATE_TRUNC('month', MIN(o.occurred_at)) FROM orders AS o)
+ORDER BY o.account_id, o.occurred_at;
